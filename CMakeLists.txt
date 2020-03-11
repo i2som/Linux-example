@@ -1,0 +1,9 @@
+cmake_minimum_required(VERSION 3.2)
+project(linux-examples-c)
+
+add_subdirectory(canbus)
+add_subdirectory(gpio-legacy)
+add_subdirectory(gpio-libgpiod)
+add_subdirectory(rtc)
+add_subdirectory(serialport)
+add_subdirectory(watchdog)
