@@ -199,12 +199,11 @@ int main(int argc, char *argv[])
 	int  fd, next_option, havearg = 0;
 	char *device;
 	int i=0,j=0;
-	int nread;			/* Read the counts of data */
 	char buff[512];		/* Recvice data buffer */
 	pid_t pid;
 	char xmit[20] = {0x0}; /* Default send data */
 	int speed, send_mode = 0;
-	int wsz = 0;
+	int wsz = 0, rsz = 0;
 	const char *const short_options = "hd:s:b:m:";
 
 	const struct option long_options[] = {
@@ -273,18 +272,39 @@ int main(int argc, char *argv[])
 			printf("\n");
 			sleep(1);
 			i++;
+			if (i > 0xff)
+				i = 0x0;
 			memset(xmit, i, sizeof(xmit));
-			usleep(1000);
-		}
-	}else {
-		while(1) {
+			//usleep(1000);
+
 			memset(buff, 0, sizeof(buff));
-			nread = read(fd, buff, sizeof(buff));
-			if (nread > 0) {
-				printf("%s RECV[%d]: ", device, nread);
-				for(int j = 0; j < nread; j++)
+			rsz = read(fd, buff, sizeof(buff));
+			if (rsz > 0) {
+				printf("%s RECV[%d]: ", device, rsz);
+				for(int j = 0; j < rsz; j++)
 					printf("0x%x ", buff[j]);
 				printf("\n");
+			}
+		}
+	}else {
+		i = 0xff;
+		while(1) {
+			memset(buff, 0, sizeof(buff));
+			rsz = read(fd, buff, sizeof(buff));
+			if (rsz > 0) {
+				printf("%s RECV[%d]: ", device, rsz);
+				for(int j = 0; j < rsz; j++)
+					printf("0x%x ", buff[j]);
+				printf("\n");
+				memset(xmit, i, sizeof(xmit));
+				wsz = write(fd, xmit, sizeof(xmit));
+				printf("%s SEND[%d]: ", device, wsz);
+				for(int j = 0; j < wsz; j++)
+					printf("0x%x ", xmit[j]);
+				printf("\n");
+				i--;
+				if(i < 0)
+					i = 0xff;
 			}
 		}
 	}
