@@ -188,9 +188,12 @@ int rs485_enable(const int fd, const RS485_ENABLE_t enable)
         }
 
         /* Set enable/disable to configure */
-        if (enable) {   // Enable rs485 mode
-                rs485conf.flags |= SER_RS485_ENABLED | SER_RS485_RTS_AFTER_SEND;
-        } else {        // Disable rs485 mode
+        if (enable) {
+		// Enable rs485 mode
+                rs485conf.flags |= (SER_RS485_ENABLED | SER_RS485_RTS_ON_SEND);
+                rs485conf.flags &= ~(SER_RS485_RTS_AFTER_SEND);
+        } else {
+		// Disable rs485 mode
                 rs485conf.flags &= ~(SER_RS485_ENABLED);
         }
 
